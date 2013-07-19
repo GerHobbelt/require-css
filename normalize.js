@@ -30,7 +30,7 @@
  *
  */
 
-define(['require', 'module'], function(require, module) {
+define('require/normalize', ['require', 'module'], function(require, module) {
   
   // regular expression for removing double slashes
   // eg http://www.example.com//my///url/here -> http://www.example.com/my/url/here

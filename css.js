@@ -33,11 +33,11 @@
  *
  */
 
-define(['./normalize'], function(normalize) {
-  function indexOf(a, e) { for (var i=0, l=a.length; i < l; i++) if (a[i] === e) return i; return -1 }
+define('require/css', ['require/normalize'], function(normalize) {
+  function indexOf(a, e) { for (var i=0, l=a.length; i < l; i++) if (a[i] === e) return i; return -1; }
 
   if (typeof window == 'undefined')
-    return { load: function(n, r, load){ load() } };
+    return { load: function(n, r, load){ load(); } };
 
   // set to true to enable test prompts for device testing
   var testing = false;
@@ -64,8 +64,9 @@ define(['./normalize'], function(normalize) {
     hackLinks = parseInt(engine[4]) < 18;
     engine = 'gecko';
   }
-  else if (testing)
+  else if (testing) {
     alert('Engine detection failed');
+  }
   
   //main api object
   var cssAPI = {};
@@ -258,8 +259,9 @@ define(['./normalize'], function(normalize) {
         mozillaLoadCheck(style, _callback);
         head.appendChild(style);
       }
-      else if (engine == 'trident')
+      else if (engine == 'trident') {
         ieLoad(url, _callback);
+      }
     }
   }
 

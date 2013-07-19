@@ -1,4 +1,4 @@
-define(['require', './normalize'], function(req, normalize) {
+define('require/css-builder', ['require', 'require/css.normalize'], function(req, normalize) {
   var nodePrint = function() {};
   if (requirejs.tools)
     requirejs.tools.useLib(function(req) {
