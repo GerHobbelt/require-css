@@ -468,6 +468,10 @@ define('require/css', ['require/normalize'], function(normalize) {
             setTimeout(load, 7);
           });
         }
+      }, function (err) {
+        if (load.error) {
+          load.error(err);
+        }
       });
     }
   };
