@@ -100,12 +100,16 @@ define('require/css', ['require/normalize'], function(normalize) {
   var bufferResources = [];
 
   cssAPI.addBuffer = function(resourceId) {
+    console.log("*** require.css addBuffer", resourceId, curBuffer, bufferResources);
+
     // just in case layer scripts are included twice, also check
     // against the previous buffers
     if (indexOf(curBuffer, resourceId) != -1) {
+      console.log("*** require.css addBuffer", resourceId, curBuffer, bufferResources, ', index: ', indexOf(curBuffer, resourceId));
       return;
     }
     if (indexOf(bufferResources, resourceId) != -1) {
+      console.log("*** require.css addBuffer", resourceId, curBuffer, bufferResources, ', index: ', indexOf(bufferResources, resourceId));
       return;
     }
     curBuffer.push(resourceId);
@@ -113,6 +117,8 @@ define('require/css', ['require/normalize'], function(normalize) {
   };
 
   cssAPI.setBuffer = function(css, isLess) {
+    console.log("*** require-CSS.setBuffer", arguments);
+
     var pathname = window.location.pathname.split('/');
     pathname.pop();
     pathname = pathname.join('/') + '/';
@@ -157,6 +163,8 @@ define('require/css', ['require/normalize'], function(normalize) {
   };
 
   cssAPI.attachBuffer = function(resourceId, load) {
+    console.log("*** require-CSS.attachBuffer", arguments);
+
     // attach can happen during buffer collecting, or between injection and callback
     // we assume it is not possible to attach multiple callbacks
     // requirejs plugin load function ensures this by queueing duplicate calls
@@ -165,6 +173,7 @@ define('require/css', ['require/normalize'], function(normalize) {
     for (var i = 0; i < curBuffer.length; i++) {
       if (curBuffer[i] == resourceId) {
         onBufferLoad[resourceId] = load;
+        console.log("*** require-CSS.attachBuffer: onBufferLoad[] buffered", arguments, onBufferLoad, onBufferLoad[resourceId]);
         return true;
       }
     }
@@ -173,11 +182,13 @@ define('require/css', ['require/normalize'], function(normalize) {
     // (onBufferLoad === true is a shortcut indicator for this)
     if (onBufferLoad[resourceId] === true) {
       onBufferLoad[resourceId] = load;
+      console.log("*** require-CSS.attachBuffer: onBufferLoad[] waiting", arguments, onBufferLoad, onBufferLoad[resourceId]);
       return true;
     }
 
     // if it's in the full buffer list and not either of the above, its loaded already
     if (indexOf(bufferResources, resourceId) != -1) {
+      console.log("*** require-CSS.attachBuffer: load()", arguments, bufferResources, ', index: ', indexOf(bufferResources, resourceId));
       load();
       return true;
     }
@@ -251,6 +262,8 @@ define('require/css', ['require/normalize'], function(normalize) {
   var noop = function(){};
 
   cssAPI.linkLoad = function(url, callback) {
+    console.log("*** require-CSS.linkLoad", arguments);
+
     var link;
     var timeout = setTimeout(function() {
       if (testing) alert('timeout');
@@ -343,6 +356,8 @@ define('require/css', ['require/normalize'], function(normalize) {
   var styleCnt = 0;
   var curStyle;
   cssAPI.inject = function(css) {
+    console.log("*** require-CSS.inject", arguments);
+
     if (styleCnt < 31) {
       curStyle = document.createElement('style');
       curStyle.type = 'text/css';
@@ -423,6 +438,8 @@ define('require/css', ['require/normalize'], function(normalize) {
   var waitSeconds;
   var alerted = false;
   cssAPI.load = function(cssId, req, load, config, parse) {
+    console.log("*** require-CSS.load", arguments, this);
+
     waitSeconds = waitSeconds || config.waitSeconds || 7;
 
     var resourceId = cssId + (!parse ? '.css' : '.less');
