@@ -262,7 +262,7 @@ define('require/css', ['require/normalize'], function(normalize) {
   var noop = function(){};
 
   cssAPI.linkLoad = function(url, callback) {
-    console.log("*** require-CSS.linkLoad", arguments);
+    console.log("*** require-CSS.linkLoad", url, arguments);
 
     var link;
     var timeout = setTimeout(function() {
