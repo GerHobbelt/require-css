@@ -4,6 +4,7 @@
   baseUrl: '.',
   fileExclusionRegExp: /(^example)|(.git)$/,
   //separateCSS: true,
+  //buildCSS: false,
   optimizeCss: "node",
   map: {
     '*': {
@@ -17,7 +18,6 @@
   },
   {
     name: 'core-components',
-    separateCSS: true,
     create: true,
     include: ['components/component'], 
   },
