@@ -54,7 +54,7 @@ define(function() {
       return absoluteURI(uri, fromBase);
     
     else {
-      return relativeURI(absoluteURI(uri, fromBase), toBase);
+      return "/" + relativeURI(absoluteURI(uri, fromBase), toBase);
     }
   };
   
