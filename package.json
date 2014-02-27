@@ -1,5 +1,30 @@
 {
-  "volo": {
-    "type": "directory"
-  }
+    "name": "require-css",
+    "description": "RequireJS CSS requiring and optimization.",
+    "version": "0.0.81",
+    "homepage": "https://github.com/guybedford/require-css",
+        "author": {
+            "name": "Guy Bedford",
+            "email": "guybedford@gmail.com"
+        },
+    "repository": {
+        "type": "git",
+        "url": "git@github.com:guybedford/require-css.git"
+    },
+    "bugs": {
+        "url": "https://github.com/guybedford/require-css/issuess"
+    },
+    "peerDependencies": {
+        "requirejs": "~2.1.10",
+    },
+    "keywords": [
+        "requirejs",
+        "require",
+        "css",
+        "require-css"
+    ],
+    "volo": {
+        "type": "directory"
+    },
+    "readmeFilename": "README.md"
 }
