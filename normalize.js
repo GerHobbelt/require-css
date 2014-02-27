@@ -41,7 +41,7 @@ define(['require', 'module'], function(require, module) {
 
   // given a relative URI, and two absolute base URIs, convert it from one base to another
   var protocolRegEx = /[^\:\/]*:\/\/([^\/])*/
-  function convertURIBase(uri, fromBase, toBase) {
+  function convertURIBase(uri, fromBase, toBase, modulePath) {
     if(uri.indexOf("data:") === 0)
       return uri;
     uri = removeDoubleSlashes(uri);
@@ -56,7 +56,11 @@ define(['require', 'module'], function(require, module) {
       return absoluteURI(uri, fromBase);
     
     else {
-      return relativeURI(absoluteURI(uri, fromBase), toBase);
+      //return relativeURI(absoluteURI(uri, fromBase), toBase, modulePath);
+      if(modulePath)
+        return modulePath + uri;
+      else
+        return relativeURI(absoluteURI(uri, fromBase), toBase);
     }
   };
   
@@ -109,7 +113,7 @@ define(['require', 'module'], function(require, module) {
     return out.substr(0, out.length - 1);
   };
   
-  var normalizeCSS = function(source, fromBase, toBase, cssBase) {
+  var normalizeCSS = function(source, fromBase, toBase, cssBase, modulePath) {
 
     fromBase = removeDoubleSlashes(fromBase);
     toBase = removeDoubleSlashes(toBase);
@@ -120,10 +124,12 @@ define(['require', 'module'], function(require, module) {
     while (result = urlRegEx.exec(source)) {
       url = result[3] || result[2] || result[5] || result[6] || result[4];
       var newUrl;
-      if (cssBase && url.substr(0, 1) == '/')
+      if(!modulePath) 
+        newUrl = require.toUrl(url);
+      else if (cssBase && url.substr(0, 1) == '/')
         newUrl = cssBase + url;
       else
-        newUrl = convertURIBase(url, fromBase, toBase);
+        newUrl = convertURIBase(url, fromBase, toBase, modulePath);
       var quoteLen = result[5] || result[6] ? 1 : 0;
       source = source.substr(0, urlRegEx.lastIndex - url.length - quoteLen - 1) + newUrl + source.substr(urlRegEx.lastIndex - quoteLen - 1);
       urlRegEx.lastIndex = urlRegEx.lastIndex + (newUrl.length - url.length);
