@@ -171,8 +171,8 @@ define(['require', './normalize'], function(req, normalize) {
     var fileUrl = req.toUrl(name);
 
     //external URLS don't get added (just like JS requires)
-    if (fileUrl.substr(0, 7) == 'http://' || fileUrl.substr(0, 8) == 'https://')
-      return;
+    if (cssAPI.isRemote(fileUrl))
+      return load();
 
     //add to the buffer
     _cssBuffer[name] = loadCSSFile(fileUrl, modulePath);
@@ -182,6 +182,10 @@ define(['require', './normalize'], function(req, normalize) {
       _cssBuffer[name] = parse(_cssBuffer[name]);
 
     load();
+  }
+
+  cssAPI.isRemote=function(url){
+    return (url.substr(0, 7) == 'http://' || url.substr(0, 8) == 'https://' || url.substr(0, 2) == '//')
   }
   
   cssAPI.normalize = function(name, normalize) {
@@ -195,7 +199,7 @@ define(['require', './normalize'], function(req, normalize) {
   var _cssBuffer = [];
   cssAPI.write = function(pluginName, moduleName, write, parse) {
     //external URLS don't get added (just like JS requires)
-    if (moduleName.substr(0, 7) == 'http://' || moduleName.substr(0, 8) == 'https://' || moduleName.substr(0, 2) == '//')
+    if (cssAPI.isRemote(moduleName))
       return;
     
     var resourceName = moduleName + (!parse ? '.css' : '.less');
