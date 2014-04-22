@@ -194,6 +194,16 @@ To disable any CSS build entirely, use the configuration option `buildCSS`:
 
 CSS requires will then be left in the source "as is". This shouldn't be used with `stubModules`.
 
+### Create require-css-build.txt file
+
+To create a `require-css-build.txt` file which contains CSS build files, use the configuration option `saveCSSBuild`:
+
+```javascript
+{
+  saveCSSBuild: true,
+}
+```
+
 CSS Compression
 ---------------
 
