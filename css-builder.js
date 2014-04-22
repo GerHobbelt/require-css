@@ -105,6 +105,7 @@ define(['require', './normalize'], function(req, normalize) {
 
   var layerBuffer = [];
   var cssBuffer = {};
+  var cssSrcList = [];
 
   cssAPI.load = function(name, req, load, _config) {
 
@@ -125,6 +126,14 @@ define(['require', './normalize'], function(req, normalize) {
 
     //add to the buffer
     cssBuffer[name] = normalize(loadFile(fileUrl), isWindows ? fileUrl.replace(/\\/g, '/') : fileUrl, siteRoot);
+
+    // Save CSS source file
+    if (config.saveCSSBuild) {
+      var relativeFileUrl = path.relative(process.cwd(), fileUrl);
+      if (cssSrcList.indexOf(relativeFileUrl) === -1) {
+        cssSrcList.push(relativeFileUrl);
+      }
+    }
 
     load();
   }
@@ -170,6 +179,18 @@ define(['require', './normalize'], function(req, normalize) {
     
     //clear layer buffer for next layer
     layerBuffer = [];
+    
+    // Save CSS source file list to 'require-css-build.txt'
+    if (config.saveCSSBuild) {
+      if (typeof process !== "undefined" && process.versions && !!process.versions.node && require.nodeRequire) {
+        var fs = require.nodeRequire('fs');
+        var path_ = path.join(config.dir ? config.dir : path.dirname(config.out), 'require-css-build.txt');
+        var data = cssSrcList.join('\n') + '\n';
+        fs.appendFileSync(path_, data, 'utf8');
+      }
+      // Clear CSS source file list for next layer
+      cssSrcList = [];
+    }
   }
   
   return cssAPI;
