@@ -61,7 +61,7 @@ define('require/css', ['require/normalize'], function(normalize) {
   
   //main api object
   var cssAPI = {};
-  
+
   cssAPI.pluginBuilder = './css-builder';
 
   // <style> @import load method
@@ -153,7 +153,7 @@ define('require/css', ['require/normalize'], function(normalize) {
   cssAPI.normalize = function(name, normalize) {
     if (name.substr(name.length - 4, 4) == '.css')
       name = name.substr(0, name.length - 4);
-    
+
     return normalize(name);
   };
   

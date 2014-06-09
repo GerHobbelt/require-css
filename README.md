@@ -7,6 +7,8 @@ Useful for writing modular CSS dependencies alongside scripts. For an example of
 
 For LESS inclusion, use [require-less](https://github.com/guybedford/require-less), which behaves and builds the css exactly like this module apart from the preprocessing step.
 
+<a href="https://www.gittip.com/guybedford/"><img src="http://img.shields.io/gittip/guybedford.svg" /></a>
+
 Overview
 --------
 
@@ -126,19 +128,39 @@ This will then output all the css to the file `mymodule.css`. This configuration
 
 Optimization is fully compatible with exclude and include.
 
-### Stubbing CSS Module
+### IE8 and 9 Selector Limit
 
-The RequireJS `stubModules` option allows the `css` plugin to be excluded in production when dynamic CSS requires are not going to be made (which is also entirely viable for certain use cases).
+In IE9 and below, there is a maximum limit of 4095 selectors per stylesheet.
 
-The RequireJS Optimizer Configuration for this is:
+In order to avoid this limit, CSS concatenation can be disabled entirely with the `IESelectorLimit` option.
 
 ```javascript
 {
-  stubModules: ['require-css'],
+  IESelectorLimit: true,
+  modules: [
+  {
+    name: 'mymodule'
+  }
+  ]
 }
 ```
 
-An exclude to `require-css/normalize` can also be added to the module or layer as well.
+Ideally build layers would avoid this limit entirely by naturally being designed to not reach it. This option is really only as a fix when nothing else
+is possible as it will degrade injection performance.
+
+This option is also not compatible with the `separateCSS` option.
+
+### Excluding the CSS Module in Production
+
+When dynamic CSS requires are not going to be made in production, a minimal version of RequireCSS can be written by setting a pragma for the build:
+
+```javascript
+{
+  pragmasOnSave: {
+    excludeRequireCss: true
+  }
+}
+```
 
 ### siteRoot Configuration
 
@@ -225,7 +247,4 @@ License
 ---
 
 MIT
-
-
-[![Bitdeli Badge](https://d2weczhvl823v0.cloudfront.net/guybedford/require-css/trend.png)](https://bitdeli.com/free "Bitdeli Badge")
 
