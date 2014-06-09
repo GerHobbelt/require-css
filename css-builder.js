@@ -105,6 +105,7 @@ define('require/css-builder', ['require', 'require/css.normalize'], function(req
 
   var layerBuffer = [];
   var cssBuffer = {};
+  var cssSrcList = [];
 
   cssAPI.load = function(name, req, load, _config) {
 
@@ -126,7 +127,7 @@ define('require/css-builder', ['require', 'require/css.normalize'], function(req
       fileUrl = fileUrl.replace(/\\/g, '/');
 
     // rebase to the output directory if based on the source directory;
-    // baseUrl points always to the ouptut directory, fileUrl only if
+    // baseUrl points always to the output directory, fileUrl only if
     // it is not prefixed by a computed path (relative too)
     var fileSiteUrl = fileUrl;
     if (fileSiteUrl.indexOf(baseUrl) < 0) {
@@ -139,6 +140,14 @@ define('require/css-builder', ['require', 'require/css.normalize'], function(req
 
     //add to the buffer
     cssBuffer[name] = normalize(loadFile(fileUrl), fileSiteUrl, siteRoot);
+
+    // Save CSS source file
+    if (config.saveCSSBuild) {
+      var relativeFileUrl = path.relative(process.cwd(), fileUrl);
+      if (cssSrcList.indexOf(relativeFileUrl) === -1) {
+        cssSrcList.push(relativeFileUrl);
+      }
+    }
 
     load();
   }
@@ -163,7 +172,7 @@ define('require/css-builder', ['require', 'require/css.normalize'], function(req
   cssAPI.onLayerEnd = function(write, data) {
     if (config.separateCSS && config.IESelectorLimit)
       throw 'RequireCSS: separateCSS option is not compatible with ensuring the IE selector limit';
-
+    var outPath = config.dir ? config.baseUrl + data.name + '.css' : config.out.replace(/(\.js)?$/, '.css');
     if (config.separateCSS) {
       var outPath = data.path.replace(/(\.js)?$/, '.css');
       console.log('Writing CSS! file: ' + outPath + '\n');
@@ -191,6 +200,18 @@ define('require/css-builder', ['require', 'require/css.normalize'], function(req
     }
     //clear layer buffer for next layer
     layerBuffer = [];
+    
+    // Save CSS source file list to 'require-css-build.txt'
+    if (config.saveCSSBuild) {
+      if (typeof process !== "undefined" && process.versions && !!process.versions.node && require.nodeRequire) {
+        var fs = require.nodeRequire('fs');
+        var path_ = path.join(config.dir ? config.dir : path.dirname(config.out), 'require-css-build.txt');
+        var data = cssSrcList.join('\n') + '\n';
+        fs.appendFileSync(path_, data, 'utf8');
+      }
+      // Clear CSS source file list for next layer
+      cssSrcList = [];
+    }
   }
 
   return cssAPI;
