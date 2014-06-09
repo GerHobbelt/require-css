@@ -1,7 +1,7 @@
 {
     "name": "require-css",
     "description": "RequireJS CSS requiring and optimization.",
-    "version": "0.0.83",
+    "version": "0.1.4",
     "homepage": "https://github.com/guybedford/require-css",
     "author": {
         "name": "Guy Bedford",
@@ -15,7 +15,7 @@
         "url": "https://github.com/guybedford/require-css/issuess"
     },
     "peerDependencies": {
-        "requirejs": "~2.1.10"
+        "requirejs": ">=2.1.10"
     },
     "keywords": [
         "requirejs",
