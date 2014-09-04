@@ -1,5 +1,7 @@
 example/www-built
+.DS_Store
 
 # ignore editor bak files
 *~
 *.bak
+

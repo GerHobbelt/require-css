@@ -45,6 +45,16 @@ map: {
 }
 ```
 
+If you put the `require-css` directory in a path other than the default `baseUrl` location, you **MUST** add the following [paths configuration](http://requirejs.org/docs/api.html#config-paths) in RequireJS:
+
+```javascript
+paths: {
+  'require-css': 'your/path/to/require-css'
+}
+```
+
+This configuration is **required** to location `normalize.js` and `css-builder.js` files for optimization.
+
 Use Cases and Benefits
 ----------------------
 
@@ -88,7 +98,7 @@ Optimizer configuration:
   modules: [
   {
     name: 'mymodule',
-    exclude: ['css/normalize']
+    exclude: ['require-css/normalize']
   }
   ]
 }
@@ -107,7 +117,7 @@ Then the optimizer output would be:
 -mymodule.js containing:
  style.css and page.css which will be dynamically injected
 
-The `css/normalize` exclude is needed due to [r.js issue #289](https://github.com/jrburke/r.js/issues/289)
+The `require-css/normalize` exclude is needed due to [r.js issue #289](https://github.com/jrburke/r.js/issues/289)
  
 ### Separate File Output
 
@@ -156,6 +166,7 @@ When dynamic CSS requires are not going to be made in production, a minimal vers
 
 ```javascript
 {
+  stubModules: ['require-css/css'],
   pragmasOnSave: {
     excludeRequireCss: true
   }
@@ -215,6 +226,16 @@ To disable any CSS build entirely, use the configuration option `buildCSS`:
 ```
 
 CSS requires will then be left in the source "as is". This shouldn't be used with `stubModules`.
+
+### Create require-css-build.txt file
+
+To create a `require-css-build.txt` file which contains CSS build files, use the configuration option `saveCSSBuild`:
+
+```javascript
+{
+  saveCSSBuild: true,
+}
+```
 
 CSS Compression
 ---------------
