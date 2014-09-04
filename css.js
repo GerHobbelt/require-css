@@ -30,7 +30,7 @@
  *
  */
 
-define('require/css', ['require/normalize'], function(normalize) {
+define('require/css', ['require/normalize'], function (normalize) {
   if (typeof window === 'undefined') {
     return {
       load: function(n, r, load) {
@@ -50,14 +50,15 @@ define('require/css', ['require/normalize'], function(normalize) {
   var useOnload = true;
 
   // trident / msie
-  if (engine[1] || engine[7])
+  if (engine[1] || engine[7]) {
     useImportLoad = parseInt(engine[1], 10) < 6 || parseInt(engine[7], 10) <= 9;
   // webkit
-  else if (engine[2])
+  } else if (engine[2]) {
     useOnload = false;
   // gecko
-  else if (engine[4])
+  } else if (engine[4]) {
     useImportLoad = parseInt(engine[4], 10) < 18;
+  }
   
   //main api object
   var cssAPI = {};
@@ -75,16 +76,18 @@ define('require/css', ['require/normalize'], function(normalize) {
   var ieLoads = [];
   var ieCurCallback;
   
-  var createIeLoad = function(url) {
+  var createIeLoad = function (url) {
     ieCnt++;
     if (ieCnt == 32) {
       createStyle();
       ieCnt = 0;
     }
     curSheet.addImport(url);
-    curStyle.onload = function(){ processIeLoad() };
+    curStyle.onload = function () { 
+      processIeLoad(); 
+    };
   }
-  var processIeLoad = function() {
+  var processIeLoad = function () {
     ieCurCallback();
  
     var nextLoad = ieLoads.shift();
@@ -97,9 +100,10 @@ define('require/css', ['require/normalize'], function(normalize) {
     ieCurCallback = nextLoad[1];
     createIeLoad(nextLoad[0]);
   }
-  var importLoad = function(url, callback) {
-    if (!curSheet || !curSheet.addImport)
+  var importLoad = function (url, callback) {
+    if (!curSheet || !curSheet.addImport) {
       createStyle();
+    }
 
     if (curSheet && curSheet.addImport) {
       // old IE
@@ -115,12 +119,12 @@ define('require/css', ['require/normalize'], function(normalize) {
       // old Firefox
       curStyle.textContent = '@import "' + url + '";';
 
-      var loadInterval = setInterval(function() {
+      var loadInterval = setInterval(function () {
         try {
           curStyle.sheet.cssRules;
           clearInterval(loadInterval);
           callback();
-        } catch(e) {}
+        } catch (e) {}
       }, 10);
     }
   };
@@ -130,37 +134,42 @@ define('require/css', ['require/normalize'], function(normalize) {
     var link = document.createElement('link');
     link.type = 'text/css';
     link.rel = 'stylesheet';
-    if (useOnload)
-      link.onload = function() {
-        link.onload = function() {};
+    if (useOnload) {
+      link.onload = function () {
+        link.onload = function () {};
         // for style dimensions queries, a short delay can still be necessary
         setTimeout(callback, 7);
       }
-    else
-      var loadInterval = setInterval(function() {
+    } else {
+      var loadInterval = setInterval(function () {
         for (var i = 0; i < document.styleSheets.length; i++) {
           var sheet = document.styleSheets[i];
-          if (sheet.href == link.href) {
+          if (sheet.href === link.href) {
             clearInterval(loadInterval);
             return callback();
           }
         }
       }, 10);
+    }
     link.href = url;
     head.appendChild(link);
   };
 
   cssAPI.normalize = function(name, normalize) {
-    if (name.substr(name.length - 4, 4) == '.css')
+    if (name.substr(name.length - 4, 4) === '.css') {
       name = name.substr(0, name.length - 4);
+    }
 
     return normalize(name);
   };
   
   cssAPI.load = function(cssId, req, load, config) {
 
-    (useImportLoad ? importLoad : linkLoad)((useImportLoad ? req.toUrl(cssId) : cssId) + '.css', load);
-
+    if (useImportLoad) {
+      importLoad(req.toUrl(cssId) + '.css', load);
+    } else {
+      linkLoad(cssId + '.css', load);
+    }
 
 /*
 // TODO: add these to both handlers:

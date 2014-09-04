@@ -8,18 +8,20 @@ define('require/css-builder', ['require', 'require/css.normalize'], function(req
       return css;
     }
     if (typeof process !== "undefined" && process.versions && !!process.versions.node && require.nodeRequire) {
+      var csso;
+
       try {
-        var csso = require.nodeRequire('csso');
+        csso = require.nodeRequire('csso');
       }
-      catch(e) {
+      catch (e) {
         console.log('Compression module not installed. Use "npm install csso -g" to enable.');
         return css;
       }
       var csslen = css.length;
       try {
-        css =  csso.justDoIt(css);
+        css = csso.justDoIt(css);
       }
-      catch(e) {
+      catch (e) {
         console.log('Compression failed due to a CSS syntax error.');
         return css;
       }
@@ -117,17 +119,20 @@ define('require/css-builder', ['require', 'require/css.normalize'], function(req
 
     if (!siteRoot) {
       siteRoot = path.resolve(config.dir || path.dirname(config.out), config.siteRoot || '.') + '/';
-      if (isWindows)
+      if (isWindows) {
         siteRoot = siteRoot.replace(/\\/g, '/');
+      }
     }
 
     //external URLS don't get added (just like JS requires)
-    if (name.match(absUrlRegEx))
+    if (name.match(absUrlRegEx)) {
       return load();
+    }
 
     var fileUrl = req.toUrl(name + '.css');
-    if (isWindows)
+    if (isWindows) {
       fileUrl = fileUrl.replace(/\\/g, '/');
+    }
 
     // rebase to the output directory if based on the source directory;
     // baseUrl points always to the output directory, fileUrl only if
@@ -135,10 +140,12 @@ define('require/css-builder', ['require', 'require/css.normalize'], function(req
     var fileSiteUrl = fileUrl;
     if (fileSiteUrl.indexOf(baseUrl) < 0) {
       var appRoot = req.toUrl(config.appDir);
-      if (isWindows)
+      if (isWindows) {
         appRoot = appRoot.replace(/\\/g, '/');
-      if (fileSiteUrl.indexOf(appRoot) == 0)
+      }
+      if (fileSiteUrl.indexOf(appRoot) === 0) {
         fileSiteUrl = siteRoot + fileSiteUrl.substring(appRoot.length);
+      }
     }
 
     //add to the buffer
@@ -156,25 +163,29 @@ define('require/css-builder', ['require', 'require/css.normalize'], function(req
   }
 
   cssAPI.normalize = function(name, normalize) {
-    if (name.substr(name.length - 4, 4) == '.css')
+    if (name.substr(name.length - 4, 4) === '.css') {
       name = name.substr(0, name.length - 4);
+    }
     return normalize(name);
   }
 
   cssAPI.write = function(pluginName, moduleName, write, parse) {
     //external URLS don't get added (just like JS requires)
-    if (moduleName.match(absUrlRegEx))
+    if (moduleName.match(absUrlRegEx)) {
       return;
+    }
 
     layerBuffer.push(cssBuffer[moduleName]);
 
-    if (config.buildCSS != false)
-    write.asModule(pluginName + '!' + moduleName, 'define(function(){})');
+    if (config.buildCSS) {
+      write.asModule(pluginName + '!' + moduleName, 'define(function () {})');
+    }
   }
 
   cssAPI.onLayerEnd = function(write, data) {
-    if (config.separateCSS && config.IESelectorLimit)
+    if (config.separateCSS && config.IESelectorLimit) {
       throw 'RequireCSS: separateCSS option is not compatible with ensuring the IE selector limit';
+    }
     var outPath = config.dir ? config.baseUrl + data.name + '.css' : config.out.replace(/(\.js)?$/, '.css');
     if (config.separateCSS) {
       var outPath = data.path.replace(/(\.js)?$/, '.css');
@@ -182,21 +193,31 @@ define('require/css-builder', ['require', 'require/css.normalize'], function(req
 
       var css = layerBuffer.join('');
 
-      if (fs.existsSync(outPath))
+      if (fs.existsSync(outPath)) {
         console.log('RequireCSS: Warning, separateCSS module path "' + outPath + '" already exists and is being replaced by the layer CSS.');
+      }
 
       process.nextTick(function() {
         saveFile(outPath, compress(css));
       });
 
     }
-    else if (config.buildCSS != false) {
+    else if (config.buildCSS) {
       var styles = config.IESelectorLimit ? layerBuffer : [layerBuffer.join('')];
       for (var i = 0; i < styles.length; i++) {
-        if (styles[i] == '')
+        if (styles[i] === '') {
           return;
+        }
         write(
-          "(function(c){var d=document,a='appendChild',i='styleSheet',s=d.createElement('style');s.type='text/css';d.getElementsByTagName('head')[0][a](s);s[i]?s[i].cssText=c:s[a](d.createTextNode(c));})\n"
+           "(function (c) {\n" +
+           "  var d = document,\n" +
+           "      a = 'appendChild',\n" +
+           "      i= 'styleSheet',\n" +
+           "      s = d.createElement('style');\n" +
+           "  s.type = 'text/css';\n" +
+           "  d.getElementsByTagName('head')[0][a](s);\n" +
+           "  s[i] ? s[i].cssText = c : s[a](d.createTextNode(c));\n" +
+           "})\n"
           + "('" + escape(compress(styles[i])) + "');\n"
         );
       }
