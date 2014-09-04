@@ -82,7 +82,7 @@ define('require/css', ['require/normalize'], function(normalize) {
       ieCnt = 0;
     }
     curSheet.addImport(url);
-    curStyle.onload = processIeLoad;
+    curStyle.onload = function(){ processIeLoad() };
   }
   var processIeLoad = function() {
     ieCurCallback();

@@ -4,6 +4,9 @@ define('require/css-builder', ['require', 'require/css.normalize'], function(req
   var isWindows = !!process.platform.match(/^win/);
 
   function compress(css) {
+    if (config.optimizeCss == 'none') {
+      return css;
+    }
     if (typeof process !== "undefined" && process.versions && !!process.versions.node && require.nodeRequire) {
       try {
         var csso = require.nodeRequire('csso');
