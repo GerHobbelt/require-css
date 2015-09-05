@@ -41,7 +41,7 @@ define('require/css', ['require/normalize'], function (normalize) {
 
   var head = document.getElementsByTagName('head')[0];
 
-  var engine = window.navigator.userAgent.match(/Trident\/([^ ;]*)|AppleWebKit\/([^ ;]*)|Opera\/([^ ;]*)|rv\:([^ ;]*)(.*?)Gecko\/([^ ;]*)|MSIE\s([^ ;]*)/) || 0;
+  var engine = window.navigator.userAgent.match(/Trident\/([^ ;]*)|AppleWebKit\/([^ ;]*)|Opera\/([^ ;]*)|rv\:([^ ;]*)(.*?)Gecko\/([^ ;]*)|MSIE\s([^ ;]*)|AndroidWebKit\/([^ ;]*)/) || 0;
 
   // use <style> @import load method (IE < 9, Firefox < 18)
   var useImportLoad = false;
@@ -53,13 +53,13 @@ define('require/css', ['require/normalize'], function (normalize) {
   if (engine[1] || engine[7]) {
     useImportLoad = parseInt(engine[1], 10) < 6 || parseInt(engine[7], 10) <= 9;
   // webkit
-  } else if (engine[2]) {
+  } else if (engine[2] || engine[8]) {
     useOnload = false;
   // gecko
   } else if (engine[4]) {
     useImportLoad = parseInt(engine[4], 10) < 18;
   }
-  
+
   //main api object
   var cssAPI = {};
 
