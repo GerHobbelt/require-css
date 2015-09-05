@@ -7,6 +7,7 @@ define('require/css-builder', ['require', 'require/css.normalize'], function(req
     if (config.optimizeCss == 'none') {
       return css;
     }
+    
     if (typeof process !== "undefined" && process.versions && !!process.versions.node && require.nodeRequire) {
       var csso;
 
@@ -97,7 +98,9 @@ define('require/css-builder', ['require', 'require/css.normalize'], function(req
   // NB add @media query support for media imports
   var importRegEx = /@import\s*(url)?\s*(('([^']*)'|"([^"]*)")|\(('([^']*)'|"([^"]*)"|([^\)]*))\))\s*;?/g;
   var absUrlRegEx = /^([^\:\/]+:\/)?\//;
-
+  
+  // Write Css module definition
+  var writeCSSDefinition = "define('@writecss', function() {return function writeCss(c) {var d=document,a='appendChild',i='styleSheet',s=d.createElement('style');s.type='text/css';d.getElementsByTagName('head')[0][a](s);s[i]?s[i].cssText=c:s[a](d.createTextNode(c));};});";
 
   var siteRoot;
 
@@ -108,12 +111,12 @@ define('require/css-builder', ['require', 'require/css.normalize'], function(req
   var curModule = 0;
   var config;
 
+  var writeCSSForLayer = true;
   var layerBuffer = [];
   var cssBuffer = {};
   var cssSrcList = [];
 
   cssAPI.load = function(name, req, load, _config) {
-
     //store config
     config = config || _config;
 
@@ -170,15 +173,40 @@ define('require/css-builder', ['require', 'require/css.normalize'], function(req
   }
 
   cssAPI.write = function(pluginName, moduleName, write, parse) {
+    var cssModule;
+    
     //external URLS don't get added (just like JS requires)
     if (moduleName.match(absUrlRegEx)) {
       return;
     }
 
     layerBuffer.push(cssBuffer[moduleName]);
+    
+    if (!global._requirejsCssData) {
+      global._requirejsCssData = {
+        usedBy: {css: true},
+        css: ''
+      }
+    } else {
+      global._requirejsCssData.usedBy.css = true;
+    }
 
     if (config.buildCSS) {
-      write.asModule(pluginName + '!' + moduleName, 'define(function () {})');
+      var style = cssBuffer[moduleName];
+
+      if (config.writeCSSModule && style) {
+ 	    if (writeCSSForLayer) {
+    	  writeCSSForLayer = false;
+          write(writeCSSDefinition);
+        }
+
+        cssModule = 'define(["@writecss"], function(writeCss){\n writeCss("'+ escape(compress(style)) +'");\n})';
+      }
+      else {
+		cssModule = 'define(function(){})';
+      }
+
+      write.asModule(pluginName + '!' + moduleName, cssModule);
     }
   }
 
@@ -193,16 +221,20 @@ define('require/css-builder', ['require', 'require/css.normalize'], function(req
 
       var css = layerBuffer.join('');
 
-      if (fs.existsSync(outPath)) {
-        console.log('RequireCSS: Warning, separateCSS module path "' + outPath + '" already exists and is being replaced by the layer CSS.');
-      }
-
       process.nextTick(function() {
+        if (global._requirejsCssData) {
+          css = global._requirejsCssData.css = css + global._requirejsCssData.css;
+          delete global._requirejsCssData.usedBy.css;
+          if (Object.keys(global._requirejsCssData.usedBy).length === 0) {
+            delete global._requirejsCssData;
+          }
+        }
+        
         saveFile(outPath, compress(css));
       });
 
     }
-    else if (config.buildCSS) {
+    else if (config.buildCSS && !config.writeCSSModule) {
       var styles = config.IESelectorLimit ? layerBuffer : [layerBuffer.join('')];
       for (var i = 0; i < styles.length; i++) {
         if (styles[i] === '') {
@@ -224,6 +256,7 @@ define('require/css-builder', ['require', 'require/css.normalize'], function(req
     }
     //clear layer buffer for next layer
     layerBuffer = [];
+    writeCSSForLayer = true;
     
     // Save CSS source file list to 'require-css-build.txt'
     if (config.saveCSSBuild) {
