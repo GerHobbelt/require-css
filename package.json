@@ -1,7 +1,7 @@
 {
     "name": "require-css",
     "description": "RequireJS CSS requiring and optimization.",
-    "version": "0.1.8",
+    "version": "0.1.10",
     "homepage": "https://github.com/guybedford/require-css",
     "author": {
         "name": "Guy Bedford",
@@ -25,6 +25,9 @@
     ],
     "volo": {
         "type": "directory"
+    },
+    "scripts": {
+        "test": "node test/test.js"
     },
     "readmeFilename": "README.md"
 }
