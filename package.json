@@ -7,10 +7,6 @@
         "name": "Guy Bedford",
         "email": "guybedford@gmail.com"
     },
-    "repository": {
-        "type": "git",
-        "url": "git@github.com:guybedford/require-css.git"
-    },
     "bugs": {
         "url": "https://github.com/guybedford/require-css/issuess"
     },
@@ -29,5 +25,10 @@
     "scripts": {
         "test": "node test/test.js"
     },
-    "readmeFilename": "README.md"
+    "readmeFilename": "README.md",
+    "devDependencies": {
+        "requirejs": "2.1.10"
+    },
+    "repository": "https://github.com/guybedford/require-css",
+    "license": "MIT"
 }
